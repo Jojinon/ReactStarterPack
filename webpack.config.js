@@ -1,12 +1,13 @@
 var path = require('path');
 const BrowserSyncPlugin = require("browser-sync-webpack-plugin");
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: "./src/index.tsx",
+    entry: "./src/index.jsx",
     output: {
         filename: "bundle.js",
         path: __dirname + "/dist",
-        publicPath: "/dist/",
+        publicPath: "/",
     },
     
     mode: "development",
@@ -14,13 +15,14 @@ module.exports = {
     // Enable sourcemaps for debugging webpack's output.
     devtool: "source-map",
     devServer: {
-        contentBase: ".",
+        contentBase: "./dist/",
         port: 3000,
+        index: "/dist/index.html",
     },
 
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: [".ts", ".tsx", ".js", ".json", ".css"]
+        extensions: [".ts", ".tsx", ".js", ".jsx", ".json", ".css"]
     },
 
     plugins: [
@@ -30,13 +32,20 @@ module.exports = {
             proxy: "http://localhost:3000/",
         },{
             reload: false
-        })
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/index.html",
+            filename: "./index.html"
+          }),
     ],
 
     module: {
         rules: [
             // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
             { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
+
+            // Handle jsx files
+            { test: /\.(jsx)$/, exclude: /node_modules/, loader: "babel-loader" },
 
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
             { enforce: "pre", test: /\.js$/, loader: "source-map-loader" },
